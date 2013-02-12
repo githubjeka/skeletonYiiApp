@@ -10,7 +10,7 @@ namespace Users\controllers;
 use users\models\User;
 use users\components\UserIdentityComponent;
 
-class IOController extends \Controller
+class SesameController extends \Controller
 {
     public $defaultAction = 'login';
 
@@ -44,10 +44,7 @@ class IOController extends \Controller
             $this->render('login', array('model' => $model));
 
         } else {
-
-            $profileUrl = $this->createUrl('/users/profile');
-            $this->redirect($profileUrl);
-
+            $this->redirect(array('/users/profile'));
         }
     }
 

@@ -13,7 +13,7 @@ namespace common\modules\users;
 
 class UsersModule extends \CWebModule
 {
-    public $defaultController = 'IO';
+    public $defaultController = 'Sesame';
     public $controllerNamespace = '\users\controllers';
 
     /**
