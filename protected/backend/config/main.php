@@ -16,7 +16,6 @@ Yii::setPathOfAlias('common', $root . DIRECTORY_SEPARATOR . 'common');
 Yii::setPathOfAlias('console', $root . DIRECTORY_SEPARATOR . 'console');
 Yii::setPathOfAlias('backend', $root . DIRECTORY_SEPARATOR . 'backend');
 Yii::setPathOfAlias('www', $root . DIRECTORY_SEPARATOR . 'backend' . DIRECTORY_SEPARATOR . 'www');
-Yii::setPathOfAlias('modules', dirname(__FILE__) . '/../modules/offNamespace/');
 
 $params = require_once($backendConfigDir . DIRECTORY_SEPARATOR . 'params-prod.php');
 
@@ -28,7 +27,6 @@ return CMap::mergeArray(
         'name' => 'Skeleton Airily',
         // @see http://www.yiiframework.com/doc/api/1.1/CApplication#basePath-detail
         'basePath' => 'backend',
-        'modulePath' => Yii::getPathOfAlias('modules'),
         'params' => $params,
         // preload components required before running applications
         // @see http://www.yiiframework.com/doc/api/1.1/CModule#preload-detail
