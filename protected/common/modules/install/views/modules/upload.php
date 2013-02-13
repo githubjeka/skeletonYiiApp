@@ -1,31 +1,32 @@
 <?php
 /**
+ * View module upload form
  * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
 
-echo CHtml::form('', 'post', array('enctype' => 'multipart/form-data')); ?>
+echo CHtml::beginForm('', 'post', array('enctype' => 'multipart/form-data')); ?>
 
-<fieldset>
-    <legend><?php echo Yii::t('ui','Upload modules'); ?></legend>
-    <div class="control-group">
-        <label class="control-label"><?php echo Yii::t('ui','Archive modules'); ?></label>
 
-        <div class="controls">
-            <?php echo CHtml::activeFileField($form, 'archive'); ?>
-            <p class="help-block"><?php echo Yii::t('ui','zip file extension'); ?></p>
+<div class="bg-color-blueLight">
+    <div class="page-region-content">
+        <h3><?php echo Yii::t('install', 'Upload modules'); ?></h3>
+        <label class="control-label"><?php echo Yii::t('ui', 'Archive modules'); ?></label>
+
+        <div class="input-control">
+            <?php /** @var $form \CFormModel */
+            echo CHtml::activeFileField($form, 'archive', array()); ?>
+            <p class="help-block"><?php echo Yii::t('install', 'zip file extension'); ?></p>
         </div>
+
+        <button type="submit"><?php echo Yii::t('install', 'Install'); ?></button>
     </div>
+</div>
 
 
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary"><?php echo Yii::t('ui','Install'); ?></button>
-        <!--button class="btn">Cancel</button-->
-    </div>
-</fieldset>
 
 <?php if ($form->hasErrors() or isset($out)) { ?>
-<fieldset>
-    <legend>Состояние</legend>
+<div>
+    <p>Состояние</p>
     <?php
     echo $form->getError('archive');
     if (isset($out)) {
@@ -34,7 +35,8 @@ echo CHtml::form('', 'post', array('enctype' => 'multipart/form-data')); ?>
         }
     }
     ?>
-</fieldset>
+</div>
 <?php } ?>
 
-</form>
+<?php
+echo CHtml::endForm();

@@ -15,11 +15,15 @@
     $clientScript = Yii::app()->clientScript;
     $clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/css/modern.css');
     $clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/css/modern-responsive.css');
+    $clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/css/theme.css');
     $clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/js/vendor/modernizr-2.6.2.min.js');
-    $clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/js/dropdown.js', CClientScript::POS_END);
-    $clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/js/plugins.js', CClientScript::POS_END);
-    $clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/js/main.js', CClientScript::POS_END);
+    $clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/js/metroJs/input-control.js', CClientScript::POS_END);
+    $clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/js/metroJs/dropdown.js', CClientScript::POS_END);
     $clientScript->registerCoreScript('jquery', CClientScript::POS_HEAD);
+    /*
+    $clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/js/plugins.js', CClientScript::POS_END);
+    $clientScript->registerScriptFile(Yii::app()->theme->baseUrl . '/js/user.js', CClientScript::POS_END);
+    */
     /*
      <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
      $clientScript->registerScriptFile(
@@ -42,41 +46,38 @@
 
 <div class="page">
     <div class="page-header">
-        <div class="navigation-bar">
-            <div class="navigation-bar-inner">
+        <nav class="nav-bar">
+            <div class="nav-bar-inner bg-color-grayDark padding10">
+                <a href="<?php echo Yii::app()->createUrl('/'); ?>">
+                    <span class="element brand">
+                            <?php echo Yii::app()->name ?>
+                    </span>
+                </a>
 
-                <div class="brand">
-                    <a href="<?php echo Yii::app()->createUrl('/'); ?>">
-                        <span class="name"><?php echo Yii::app()->name ?></span>
-                    </a>
-                </div>
-                <ul class="place-left">
-                    <li>
-                        <?php echo CHtml::link(Yii::t('ui','Site'),'/'); ?>
-                    </li>
-                    </ul>
-                <ul class="place-right">
+                <span class="divider"></span>
+
+                <ul class="menu">
                     <?php if (!Yii::app()->user->isGuest) { ?>
-                    <li data-role="dropdown" class="sub-menu">
-                        <a><?php echo Yii::t('ui','Menu'); ?></a>
+                    <li data-role="dropdown">
+                        <a><?php echo Yii::t('ui', 'Menu'); ?></a>
                         <?php $this->widget(
                         'zii.widgets.CMenu',
                         array(
-                            'htmlOptions' => array('class' => 'dropdown-menu place-right'),
+                            'htmlOptions' => array('class' => 'dropdown-menu'),
                             'activeCssClass' => 'active',
                             'items' => array(
-                                array('label' => Yii::t('ui','Options'), 'url' => array('/install/config')),
+                                array('label' => Yii::t('ui', 'Options'), 'url' => array('/install/config')),
                             ),
                         )
                     ); ?>
                     </li>
                     <?php } ?>
-                    <li data-role="dropdown" class="sub-menu">
+                    <li data-role="dropdown">
                         <a>User</a>
                         <?php $this->widget(
                         'zii.widgets.CMenu',
                         array(
-                            'htmlOptions' => array('class' => 'dropdown-menu place-right'),
+                            'htmlOptions' => array('class' => 'dropdown-menu'),
                             'activeCssClass' => 'active',
                             'items' => array(
                                 array(
@@ -96,7 +97,7 @@
                                 ),
                                 array(
                                     'label' => 'Logout (' . Yii::app()->user->name . ')',
-                                    'url' => array('/users/io/logout'),
+                                    'url' => array('/site/logout'),
                                     'visible' => !Yii::app()->user->isGuest
                                 )
                             ),
@@ -105,15 +106,16 @@
                     </li>
                 </ul>
 
-                <div class="clearfix"></div>
+                 <?php echo CHtml::link('<span class="element place-right">'.Yii::t('ui', 'Show site').' </span>', '/'); ?>
             </div>
-        </div>
+        </nav>
 
         <?php if (($messages = Yii::app()->user->getFlash('messages'))): ?>
         <div>
             <div class="notices">
                 <div class="bg-color-green">
                     <a href="#" class="close"></a>
+
                     <div class="notice-header fg-color-white">Access granted!</div>
                     <div class="notice-text"><?php
                         if (is_array($messages)) {
@@ -133,6 +135,10 @@
             <?php echo $content; ?>
         </div>
     </div>
+
+    <footer>
+
+    </footer>
 </div>
 
 </body>

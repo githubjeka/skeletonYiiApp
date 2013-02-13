@@ -58,4 +58,14 @@ class SiteController extends Controller
             }
         }
     }
+
+    public function actionLogin()
+    {
+        $this->redirect(array('/users'));
+    }
+
+    public function actionLogout()
+    {
+        $this->redirect(array('/users/sesame/logout'));
+    }
 }

@@ -30,8 +30,8 @@ class ModulesController extends \CController
         return array(
             array(
                 'allow',
-                'actions' => array('list', 'upload', 'delete'),
-                'users' => array('*'),
+                'actions' => array('list', 'upload', 'delete', 'stored', 'reinstall', 'DeleteFromStore'),
+                'users' => array('@'),
             ),
             array('deny'),
         );
@@ -93,9 +93,10 @@ class ModulesController extends \CController
         if (file_exists($this->getPathComposerFolder() . 'composer.json')) {
             $composer = \CJSON::decode(file_get_contents($this->getPathComposerFolder() . 'composer.json'));
         } else {
+
             $composer = array(
                 'config' => array(
-                    'vendor-dir' => \Yii::getPathOfAlias('modules'),
+                    'vendor-dir' => \Yii::app()->getModulePath(),
                     'cache-files-dir' => $this->getPathComposerFolder() . 'cache'
                 ),
                 'repositories' => array(array('packagist' => false)),
@@ -128,7 +129,7 @@ class ModulesController extends \CController
     /**
      * Run in console composer update
      * more info https://getcomposer.org/doc/03-cli.md#update
-     * @return mixed
+     * @return array of string messages
      */
     protected function runComposer()
     {
@@ -136,6 +137,7 @@ class ModulesController extends \CController
         chdir($this->getPathComposerFolder());
         exec(($this->getPhpPath() . ' ' . ' composer.phar update 2>&1'), $out);
         chdir($currentFolder);
+
         return $out;
     }
 
@@ -145,23 +147,23 @@ class ModulesController extends \CController
      * Add $additive to composer.json
      * Run composer.phar update
      * if module has migrate folder that applies migration
-     * @return bool
      */
     public function actionUpload()
     {
         $form = new UploadForm;
-        $form->archive = \CUploadedFile::getInstance($form, 'archive');
+        $archive = \CUploadedFile::getInstance($form, 'archive');
 
-        if (isset($form->archive) && $form->validate()) {
+        if (isset($archive) && $form->validate()) {
 
             $pathComposer = $this->getPathComposerFolder();
 
-            if (file_exists($pathComposer . $form->archive)) {
-                $form->addError('archive', 'Модуль этой версии был загружен ранее');
+            if (file_exists($pathComposer . $archive)) {
+                $form->addError('archive', \Yii::t('install', 'This module was previously loaded'));
             } else {
-                $form->archive->saveAs($pathComposer . $form->archive);
 
-                $fullNameModule = substr($form->archive->name, 0, -4);
+                $archive->saveAs($pathComposer . $archive);
+
+                $fullNameModule = substr($archive->name, 0, -4);
                 $fullNameModule = explode('-', $fullNameModule);
 
                 $nameModule = trim($fullNameModule[0]);
@@ -183,7 +185,7 @@ class ModulesController extends \CController
                                 'name' => $nameModule,
                                 'version' => $version,
                                 'dist' => array(
-                                    'url' => $form->archive->name,
+                                    'url' => $archive->name,
                                     'type' => 'zip',
                                 ),
                             ),
@@ -194,7 +196,8 @@ class ModulesController extends \CController
                 $this->addComposerConfig($additive);
                 $logComposer = $this->runComposer();
 
-                $migrationPath = 'backend.modules.offNamespace.' . $nameModule . '.migrations';
+                //TODO use Yii::app->getModulePath()
+                $migrationPath = 'backend.modules.' . $nameModule . '.migrations';
                 if (is_dir(\Yii::getPathOfAlias($migrationPath))) {
                     $logMigration = InstallModule::wrapperConsoleRun(
                         array('\Yiic', 'migrate', 'up', '--interactive=0', '--migrationPath=' . $migrationPath)
@@ -205,13 +208,16 @@ class ModulesController extends \CController
                 } else {
                     $log = $logComposer;
                 }
-
-                $this->render('upload', array('form' => $form, 'out' => $log));
-                return true;
             }
         }
 
-        $this->render('upload', array('form' => $form));
+        $this->render(
+            'upload',
+            array(
+                'form' => $form,
+                'out' => (isset($log)) ? $log : null,
+            )
+        );
     }
 
 
@@ -221,7 +227,7 @@ class ModulesController extends \CController
      */
     public function actionList()
     {
-        if (file_exists($path = \Yii::getPathOfAlias('modules') . '/composer/installed.json')) {
+        if (file_exists($path = \Yii::app()->getModulePath() . '/composer/installed.json')) {
             $installed = file_get_contents($path);
             $modules = \CJSON::decode($installed);
             $this->render(
@@ -260,6 +266,7 @@ class ModulesController extends \CController
                             require_once($file);
                             $class = basename($file, ".php");
                             if (class_exists($class)) {
+                                /** @var $migration \CDbMigration should be parent */
                                 $migration = new $class;
                                 ob_start();
                                 $migration->down();
@@ -290,4 +297,28 @@ class ModulesController extends \CController
         $this->redirect(\Yii::app()->createUrl('/install/modules'));
     }
 
+    public function actionStored()
+    {
+        $cacheModules = glob($this->getPathComposerFolder() . '/cache/*', GLOB_ONLYDIR);
+        if (isset($cacheModules)) {
+            $list = array();
+            foreach ($cacheModules as $pathModule) {
+                $list[basename($pathModule)]['path'] = $pathModule;
+                $list[basename($pathModule)]['version'] = glob($pathModule . '/*');
+            }
+            $cacheModules = $list;
+        }
+
+        $this->render('store', array('cacheModules' => $cacheModules));
+    }
+
+    public function actionReinstall()
+    {
+
+    }
+
+    public function actionDeleteFromStore()
+    {
+
+    }
 }

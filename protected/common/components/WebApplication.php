@@ -47,7 +47,7 @@ class WebApplication extends CWebApplication
                 );
             }
         }
-        if ($modules = glob($this->getBasePath() . '/modules/*', GLOB_ONLYDIR)) {
+        if ($modules = glob($this->getModulePath() . '/*', GLOB_ONLYDIR)) {
             foreach ($modules as $moduleDirectory) {
                 $this->setModules(array(basename($moduleDirectory)));
             }

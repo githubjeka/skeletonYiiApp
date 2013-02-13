@@ -46,6 +46,6 @@ class SiteController extends Controller
 
     public function actionLogout()
     {
-        $this->redirect(array('/users/io/logout'));
+        $this->redirect(array('/users/sesame/logout'));
     }
 }
