@@ -26,7 +26,7 @@ echo CHtml::beginForm('', 'post', array('enctype' => 'multipart/form-data')); ?>
 
 <?php if ($form->hasErrors() or isset($out)) { ?>
 <div>
-    <p>Состояние</p>
+    <p><?php echo Yii::t('install', 'Status'); ?></p>
     <?php
     echo $form->getError('archive');
     if (isset($out)) {

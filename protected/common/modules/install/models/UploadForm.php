@@ -13,7 +13,7 @@ class UploadForm extends \CFormModel
 
      public function rules(){
         return array(
-            array('archive', 'file', 'types'=>'zip'),
+            array('archive', 'file', 'types'=>'zip','on'=>'uploadModule'),
         );
     }
 }

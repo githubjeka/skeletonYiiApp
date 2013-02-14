@@ -16,7 +16,7 @@
             </li>
             <li data-role="dropdown">
                 <?php echo CHtml::link(Yii::t('ui', 'Modules')); ?>
-                <ul class="sub-menu light sidebar-dropdown-menu">
+                <ul class="sub-menu light sidebar-dropdown-menu open">
                     <li>
                         <?php echo CHtml::link(Yii::t('ui', 'List modules'), array('/install/modules')); ?>
                     </li>
