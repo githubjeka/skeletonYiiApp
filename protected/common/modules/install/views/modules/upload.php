@@ -1,6 +1,9 @@
 <?php
 /**
  * View module upload form
+ * @var $this \CController
+ * @var $form \CFormModel
+ * @var $out array()
  * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
 
@@ -13,7 +16,7 @@ echo CHtml::beginForm('', 'post', array('enctype' => 'multipart/form-data')); ?>
         <label class="control-label"><?php echo Yii::t('ui', 'Archive modules'); ?></label>
 
         <div class="input-control">
-            <?php /** @var $form \CFormModel */
+            <?php
             echo CHtml::activeFileField($form, 'archive', array()); ?>
             <p class="help-block"><?php echo Yii::t('install', 'zip file extension'); ?></p>
         </div>
@@ -24,19 +27,7 @@ echo CHtml::beginForm('', 'post', array('enctype' => 'multipart/form-data')); ?>
 
 
 
-<?php if ($form->hasErrors() or isset($out)) { ?>
-<div>
-    <p><?php echo Yii::t('install', 'Status'); ?></p>
-    <?php
-    echo $form->getError('archive');
-    if (isset($out)) {
-        foreach ($out as $ms) {
-            echo '<div>' . trim($ms, '[32m[0') . '</div>';
-        }
-    }
-    ?>
-</div>
-<?php } ?>
+<?php $this->renderPartial('_status',array('form'=>$form,'out'=>$out)); ?>
 
 <?php
 echo CHtml::endForm();

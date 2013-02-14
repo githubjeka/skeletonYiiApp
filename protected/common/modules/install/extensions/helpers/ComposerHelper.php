@@ -10,6 +10,8 @@ use Composer\Package\Version\VersionParser;
  */
 class ComposerHelper extends \CController
 {
+    protected $cFileJson = 'composer.json';
+
     /**
      * Run in console composer update
      * more info https://getcomposer.org/doc/03-cli.md#update
@@ -86,11 +88,47 @@ class ComposerHelper extends \CController
      * Json encode $newArrayconfig and put in composer.json
      * @param $newArrayConfig
      */
-    protected function filePutComposer($newArrayConfig)
+    protected function putFileComposer($newArrayConfig)
     {
         if (is_array($newArrayConfig)) {
             $newJson = \CJSON::encode($newArrayConfig);
             file_put_contents($this->getPathComposerFolder() . 'composer.json', $newJson);
+        }
+    }
+
+    /**
+     * Get json data from composer.json
+     */
+    protected function getFileComposer($returnArray = true)
+    {
+        if (file_exists($this->getPathComposerFolder() . $this->cFileJson)) {
+            return \CJSON::decode(file_get_contents($this->getPathComposerFolder() . $this->cFileJson), $returnArray);
+        }
+        return false;
+    }
+
+    /*
+     * Delete duplicates element from composer.json
+     * Return new composer.json
+     */
+    protected function deleteDuplicatesFromJsonFile()
+    {
+        if ($json = $this->getFileComposer()) {
+            $result = array_reduce($json['repositories'], function ($a, $b) {
+                static $stored = array();
+
+                $hash = md5(serialize($b));
+
+                if (!in_array($hash, $stored)) {
+                    $stored[] = $hash;
+                    $a[] = $b;
+                }
+
+                return $a;
+            }, array());
+
+            $json['repositories'] = $result;
+            $this->putFileComposer($json);
         }
     }
 
@@ -123,10 +161,14 @@ class ComposerHelper extends \CController
      */
     protected function addComposerConfig($additive = array())
     {
-        if (file_exists($this->getPathComposerFolder() . 'composer.json')) {
-            $composer = \CJSON::decode(file_get_contents($this->getPathComposerFolder() . 'composer.json'));
+        $composer = $this->getFileComposer();
+        if ($composer) {
+            if (array_key_exists('require', $composer)) {
+                $composer['require'] = \CMap::mergeArray($composer['require'], $additive['require']);
+            } else {
+                $composer['require'] = $additive['require'];
+            }
         } else {
-
             $composer = array(
                 'config' => array(
                     'vendor-dir' => \Yii::app()->getModulePath(),
@@ -137,14 +179,8 @@ class ComposerHelper extends \CController
             );
         }
 
-        if (array_key_exists('require', $composer)) {
-            $composer['require'] = \CMap::mergeArray($composer['require'], $additive['require']);
-        } else {
-            $composer['require'] = $additive['require'];
-        }
-
         $composer['repositories'] = \CMap::mergeArray($composer['repositories'], $additive['repositories']);
-        $this->filePutComposer($composer);
+        $this->putFileComposer($composer);
     }
 
     /**

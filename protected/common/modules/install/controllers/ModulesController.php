@@ -68,8 +68,8 @@ class ModulesController extends ComposerHelper
 
             if (preg_match('/[a-zA-Z]+/', $fullNameModule, $matches)) {
                 $nameModule = $matches[0];
-
-                if (preg_match('/(__)[\w-\.]+$/', $fullNameModule, $matches)) {
+                if (preg_match('/(__)[\w-\.]*$/', $fullNameModule, $matches)) {
+                    $matches[0] = substr($matches[0], 2);
                     $versionModule = $this->normalizeVersion($matches[0]);
                 } else {
                     $versionModule = $this->normalizeVersion(null);
@@ -86,51 +86,52 @@ class ModulesController extends ComposerHelper
                             }
                         }
                     }
+                }
+                if (!$form->hasErrors()) {
 
-                    if (!$form->hasErrors()) {
+                    $pathComposer = $this->getPathComposerFolder();
+                    $archive->saveAs($pathComposer . $archive);
 
-                        $pathComposer = $this->getPathComposerFolder();
-                        $archive->saveAs($pathComposer . $archive);
-
-                        $additive = array(
-                            'require' => array(
-                                $nameModule => $versionModule
-                            ),
-                            'repositories' => array(
-                                array(
-                                    'type' => 'package',
-                                    'package' => array(
-                                        'name' => $nameModule,
-                                        'version' => $versionModule,
-                                        'dist' => array(
-                                            'url' => $archive->name,
-                                            'type' => 'zip',
-                                        ),
+                    $additive = array(
+                        'require' => array(
+                            $nameModule => $versionModule
+                        ),
+                        'repositories' => array(
+                            array(
+                                'type' => 'package',
+                                'package' => array(
+                                    'name' => $nameModule,
+                                    'version' => $versionModule,
+                                    'dist' => array(
+                                        'url' => $archive->name,
+                                        'type' => 'zip',
                                     ),
-                                )
+                                ),
                             )
+                        )
+                    );
+
+                    $this->addComposerConfig($additive);
+                    $logComposer = $this->runComposer();
+
+                    unlink($this->getPathComposerFolder() . $archive);
+
+                    //TODO use Yii::app->getModulePath()
+                    $migrationPath = 'backend.modules.' . $nameModule . '.migrations';
+                    if (is_dir(\Yii::getPathOfAlias($migrationPath))) {
+                        $logMigration = InstallModule::wrapperConsoleRun(
+                            array('\Yiic', 'migrate', 'up', '--interactive=0', '--migrationPath=' . $migrationPath)
                         );
+                        $logMigration = explode("\n", $logMigration);
 
-                        $this->addComposerConfig($additive);
-                        $logComposer = $this->runComposer();
-
-
-                        //TODO use Yii::app->getModulePath()
-                        $migrationPath = 'backend.modules.' . $nameModule . '.migrations';
-                        if (is_dir(\Yii::getPathOfAlias($migrationPath))) {
-                            $logMigration = InstallModule::wrapperConsoleRun(
-                                array('\Yiic', 'migrate', 'up', '--interactive=0', '--migrationPath=' . $migrationPath)
-                            );
-                            $logMigration = explode("\n", $logMigration);
-
-                            $log = \CMap::mergeArray($logComposer, $logMigration);
-                        } else {
-                            $log = $logComposer;
-                        }
-
+                        $log = \CMap::mergeArray($logComposer, $logMigration);
+                    } else {
+                        $log = $logComposer;
                     }
 
                 }
+
+
             } else {
                 $form->addError('archive', \Yii::t('install', 'Module name is not correct'));
             }
@@ -190,7 +191,7 @@ class ModulesController extends ComposerHelper
                     if (empty($composerConfig['require'])) {
                         unset($composerConfig['require']);
                     }
-                    $this->filePutComposer($composerConfig);
+                    $this->putFileComposer($composerConfig);
                     $this->runComposer();
                     if (file_exists($pathComposer . $zipFile)) {
                         unlink($pathComposer . $zipFile);
@@ -215,9 +216,31 @@ class ModulesController extends ComposerHelper
         $this->render('store', array('cacheModules' => $this->getStoredModules()));
     }
 
-    public function actionReinstall()
+    public function actionReinstall($name = null, $ver = null)
     {
+        if ($composerArr = $this->getFileComposer()) {
+            if (isset($composerArr['require'])) {
+                foreach ($composerArr['require'] as $n => &$v) {
+                    if ($name == $n) {
+                        $v = $ver;
+                        break;
+                    }
+                }
+            } else {
+                $composerArr['require'] = array($name => $ver);
+            }
+//            foreach ($composerArr['repositories'] as $id => $repository) {
+//                if (isset($repository['package']['version']) && isset($repository['package']['name'])) {
+//                    if ($repository['package']['name'] == $name && $repository['package']['version'] = $ver) {
+//                        $repository[$id]=array();
+//                    }
+//                }
+//            }
+            $this->putFileComposer($composerArr);
+            $this->runComposer();
+        }
 
+        $this->actionStored();
     }
 
     public function actionDelete($name = null, $ver = null)
