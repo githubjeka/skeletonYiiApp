@@ -23,7 +23,7 @@ index
 
 # runtime and cache directories
 protected/backend/www/assets/
-protected/backend/www/assets/
+protected/backend/runtime/
 /protected/backend/modules/
 !/protected/backend/modules/onNamespace/.gitignore
 protected/frontend/www/assets/
