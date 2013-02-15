@@ -6,7 +6,7 @@
  * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
 
-if (isset($cacheModules)) {
+if (!empty($cacheModules)) {
     ?>
 <div>
     <p>

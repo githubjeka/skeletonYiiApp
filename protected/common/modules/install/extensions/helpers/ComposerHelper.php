@@ -243,7 +243,7 @@ class ComposerHelper extends \CController
     protected function normalizeVersion($version)
     {
         require_once("phar://" . $this->getPathComposerFolder() .
-            '/composer.phar/src/Composer\Package\Version\VersionParser.php');
+            '/composer.phar/src/Composer/Package/Version/VersionParser.php');
 
         $versionClass = new VersionParser;
         try {
