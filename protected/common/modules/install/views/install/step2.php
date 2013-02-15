@@ -6,7 +6,9 @@
 ?>
 
 <h4>
-    <small>1→</small><strong class="fg-color-blueLight">2</strong><small>→3</small>
+    <small>1→</small>
+    <strong class="fg-color-darken">2</strong>
+    <small>→3</small>
 </h4>
 
 <h1><?php echo Yii::t('install', 'Step 2. DB connection') ?></h1>
@@ -23,17 +25,17 @@
 
     <div class="input-control text row">
         <?php echo $form->label($model, 'dbHost'); ?>
-        <?php echo $form->textField($model, 'dbHost',array('required'=>true)) ?>
+        <?php echo $form->textField($model, 'dbHost', array('required' => true)) ?>
     </div>
 
     <div class="input-control text row">
         <?php echo $form->label($model, 'dbName'); ?>
-        <?php echo $form->textField($model, 'dbName',array('required'=>true)) ?>
+        <?php echo $form->textField($model, 'dbName', array('required' => true)) ?>
     </div>
 
     <div class="input-control text row">
         <?php echo $form->label($model, 'dbUserName'); ?>
-        <?php echo $form->textField($model, 'dbUserName',array('required'=>true)) ?>
+        <?php echo $form->textField($model, 'dbUserName', array('required' => true)) ?>
     </div>
 
     <div class="input-control password row">
