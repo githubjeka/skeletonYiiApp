@@ -30,7 +30,7 @@
                 <?php
                 echo CHtml::link(
                     Yii::t('install', 'Disable'),
-                    array('/install/modules/disable', 'id' => $key),
+                    array('/install/modules/disable', 'name' => $module['name']),
                     array('class' => 'btn btn-primary')
                 );
                 ?>

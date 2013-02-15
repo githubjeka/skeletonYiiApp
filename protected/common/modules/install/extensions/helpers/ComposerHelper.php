@@ -10,6 +10,9 @@ use Composer\Package\Version\VersionParser;
  */
 class ComposerHelper extends \CController
 {
+    /**
+     * @var string
+     */
     protected $cFileJson = 'composer.json';
 
     /**
@@ -23,7 +26,6 @@ class ComposerHelper extends \CController
         chdir($this->getPathComposerFolder());
         exec(($this->getPhpPath() . ' ' . ' composer.phar update 2>&1'), $out);
         chdir($currentFolder);
-
         return $out;
     }
 
@@ -92,7 +94,7 @@ class ComposerHelper extends \CController
     {
         if (is_array($newArrayConfig)) {
             $newJson = \CJSON::encode($newArrayConfig);
-            file_put_contents($this->getPathComposerFolder() . 'composer.json', $newJson);
+            file_put_contents($this->getPathComposerFolder() . $this->cFileJson, $newJson);
         }
     }
 
@@ -107,25 +109,48 @@ class ComposerHelper extends \CController
         return false;
     }
 
-    /*
+    /**
+     * Create default json data for composer.json
+     * NOTE: Not valid for install, because require is empty
+     */
+    protected function createDefaultFileComposer()
+    {
+        if (!$this->getFileComposer()) {
+            $composer = array(
+                'config' => array(
+                    'vendor-dir' => \Yii::app()->getModulePath(),
+                    'cache-files-dir' => $this->getPathComposerFolder() . 'cache'
+                ),
+                'repositories' => array(array('packagist' => false)),
+                'require' => array()
+            );
+            $this->putFileComposer($composer);
+        }
+    }
+
+    /**
      * Delete duplicates element from composer.json
      * Return new composer.json
      */
     protected function deleteDuplicatesFromJsonFile()
     {
         if ($json = $this->getFileComposer()) {
-            $result = array_reduce($json['repositories'], function ($a, $b) {
-                static $stored = array();
+            $result = array_reduce(
+                $json['repositories'],
+                function ($a, $b) {
+                    static $stored = array();
 
-                $hash = md5(serialize($b));
+                    $hash = md5(serialize($b));
 
-                if (!in_array($hash, $stored)) {
-                    $stored[] = $hash;
-                    $a[] = $b;
-                }
+                    if (!in_array($hash, $stored)) {
+                        $stored[] = $hash;
+                        $a[] = $b;
+                    }
 
-                return $a;
-            }, array());
+                    return $a;
+                },
+                array()
+            );
 
             $json['repositories'] = $result;
             $this->putFileComposer($json);
@@ -158,9 +183,12 @@ class ComposerHelper extends \CController
      * </pre>
      * more info https://getcomposer.org/doc/01-basic-usage.md
      * @param array $additive
+     * @throws \ErrorException if file composer.json not found after create
+     * @return void
      */
     protected function addComposerConfig($additive = array())
     {
+        $this->createDefaultFileComposer();
         $composer = $this->getFileComposer();
         if ($composer) {
             if (array_key_exists('require', $composer)) {
@@ -168,19 +196,43 @@ class ComposerHelper extends \CController
             } else {
                 $composer['require'] = $additive['require'];
             }
+            $composer['repositories'] = \CMap::mergeArray($composer['repositories'], $additive['repositories']);
         } else {
-            $composer = array(
-                'config' => array(
-                    'vendor-dir' => \Yii::app()->getModulePath(),
-                    'cache-files-dir' => $this->getPathComposerFolder() . 'cache'
-                ),
-                'repositories' => array(array('packagist' => false)),
-                'require' => array()
-            );
+            throw new \ErrorException($this->cFileJson . ' not found');
         }
 
-        $composer['repositories'] = \CMap::mergeArray($composer['repositories'], $additive['repositories']);
         $this->putFileComposer($composer);
+        $this->deleteDuplicatesFromJsonFile();
+    }
+
+    /**
+     * Return new Package Module
+     * Note: Action only return array, not add to composer.json
+     * @param $name
+     * @param $version
+     * @param $url
+     * @return array
+     */
+    protected function createPackage($name, $version, $url)
+    {
+        return array(
+            'require' => array(
+                $name => $version
+            ),
+            'repositories' => array(
+                array(
+                    'type' => 'package',
+                    'package' => array(
+                        'name' => $name,
+                        'version' => $version,
+                        'dist' => array(
+                            'url' => $url,
+                            'type' => 'zip',
+                        ),
+                    ),
+                )
+            )
+        );
     }
 
     /**

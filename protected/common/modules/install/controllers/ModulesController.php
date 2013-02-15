@@ -11,7 +11,13 @@ use common\modules\Install\InstallModule;
  */
 class ModulesController extends ComposerHelper
 {
+    /**
+     * @var string
+     */
     public $layout = 'install.views.layout.layout2col';
+    /**
+     * @var string
+     */
     public $defaultAction = 'list';
 
     /**
@@ -65,16 +71,18 @@ class ModulesController extends ComposerHelper
         if (isset($archive) && $form->validate()) {
 
             $fullNameModule = substr($archive->name, 0, -4);
-
+            //Get name module
             if (preg_match('/[a-zA-Z]+/', $fullNameModule, $matches)) {
+
                 $nameModule = $matches[0];
+                //Get version module
                 if (preg_match('/(__)[\w-\.]*$/', $fullNameModule, $matches)) {
                     $matches[0] = substr($matches[0], 2);
                     $versionModule = $this->normalizeVersion($matches[0]);
                 } else {
                     $versionModule = $this->normalizeVersion(null);
                 }
-
+                //Get cache module and compare version
                 if ($storedModules = $this->getStoredModules()) {
 
                     foreach ($storedModules as $name => $versions) {
@@ -87,29 +95,13 @@ class ModulesController extends ComposerHelper
                         }
                     }
                 }
+
                 if (!$form->hasErrors()) {
 
                     $pathComposer = $this->getPathComposerFolder();
                     $archive->saveAs($pathComposer . $archive);
-
-                    $additive = array(
-                        'require' => array(
-                            $nameModule => $versionModule
-                        ),
-                        'repositories' => array(
-                            array(
-                                'type' => 'package',
-                                'package' => array(
-                                    'name' => $nameModule,
-                                    'version' => $versionModule,
-                                    'dist' => array(
-                                        'url' => $archive->name,
-                                        'type' => 'zip',
-                                    ),
-                                ),
-                            )
-                        )
-                    );
+                    //create module
+                    $additive = $this->createPackage($nameModule, $versionModule, $archive->name);
 
                     $this->addComposerConfig($additive);
                     $logComposer = $this->runComposer();
@@ -131,7 +123,6 @@ class ModulesController extends ComposerHelper
 
                 }
 
-
             } else {
                 $form->addError('archive', \Yii::t('install', 'Module name is not correct'));
             }
@@ -152,20 +143,25 @@ class ModulesController extends ComposerHelper
      * Disable from composer.json
      * Delete zip file from composer folder
      * If module has migrate that run down method in file migrate
-     * @param null $id MigrateID
+     * @param null $name
      * @param bool $redirect
+     * @internal param null $id MigrateID
      * @return bool
      */
-    public function actionDisable($id = null, $redirect = true)
+    public function actionDisable($name = null, $redirect = true)
     {
-        if (ctype_digit($id) || is_int($id) && (int)$id >= 0) {
-            $pathComposer = $this->getPathComposerFolder();
-            if (file_exists($this->getPathComposerFolder() . 'composer.json')) {
-                $composerConfig = \CJSON::decode(file_get_contents($pathComposer . 'composer.json'));
-                if (isset($composerConfig['repositories'][$id + 1])) {
-                    $namePackage = $composerConfig['repositories'][$id + 1]['package']['name'];
-                    $zipFile = $composerConfig['repositories'][$id + 1]['package']['dist']['url'];
-                    $path = \Yii::app()->getModulePath() . 'offNamespace/' . $namePackage . '/migrations';
+        if (isset($name)) {
+            if ($composerConfig = $this->getFileComposer()) {
+                if (isset($composerConfig['require'])) {
+                    if (array_key_exists($name, $composerConfig['require'])) {
+                        unset($composerConfig['require'][$name]);
+                        if (empty($composerConfig['require'])) {
+                            unset($composerConfig['require']);
+                        }
+                        $this->putFileComposer($composerConfig);
+                    }
+
+                    $path = \Yii::app()->getModulePath() . '/' . $name . '/migrations';
                     if (is_dir($path)) {
                         $files = glob($path . '/m[0-9_]*.php', GLOB_BRACE);
                         krsort($files);
@@ -186,16 +182,8 @@ class ModulesController extends ComposerHelper
                             }
                         }
                     }
-                    array_splice($composerConfig['repositories'], $id + 1, 1);
-                    unset($composerConfig['require'][$namePackage]);
-                    if (empty($composerConfig['require'])) {
-                        unset($composerConfig['require']);
-                    }
-                    $this->putFileComposer($composerConfig);
+
                     $this->runComposer();
-                    if (file_exists($pathComposer . $zipFile)) {
-                        unlink($pathComposer . $zipFile);
-                    }
                 }
             }
 
@@ -211,38 +199,43 @@ class ModulesController extends ComposerHelper
     }
 
 
+    /**
+     * Render page with stored modules
+     */
     public function actionStored()
     {
         $this->render('store', array('cacheModules' => $this->getStoredModules()));
     }
 
+    /**
+     * Action, which is responsible for reinstalling module.
+     * Module from the cache of the composer.
+     * @param null $name
+     * @param null $ver
+     */
     public function actionReinstall($name = null, $ver = null)
     {
+
         if ($composerArr = $this->getFileComposer()) {
-            if (isset($composerArr['require'])) {
-                foreach ($composerArr['require'] as $n => &$v) {
-                    if ($name == $n) {
-                        $v = $ver;
-                        break;
-                    }
-                }
-            } else {
-                $composerArr['require'] = array($name => $ver);
-            }
-//            foreach ($composerArr['repositories'] as $id => $repository) {
-//                if (isset($repository['package']['version']) && isset($repository['package']['name'])) {
-//                    if ($repository['package']['name'] == $name && $repository['package']['version'] = $ver) {
-//                        $repository[$id]=array();
-//                    }
-//                }
-//            }
+
+            $urlPackage = '/cache/' . $name . '/' . $ver . '-.zip';
+            $package = $this->createPackage($name, $ver, $urlPackage);
+            $composerArr = \CMap::mergeArray($composerArr, $package);
             $this->putFileComposer($composerArr);
+            $this->deleteDuplicatesFromJsonFile();
             $this->runComposer();
         }
 
         $this->actionStored();
     }
 
+    /**
+     * Delete module from cache of the vendors composer.
+     * Note: The module is not automatically disabled.
+     * @param null $name
+     * @param null $ver
+     * @return bool
+     */
     public function actionDelete($name = null, $ver = null)
     {
         if (!empty($name) && !empty($ver)) {
