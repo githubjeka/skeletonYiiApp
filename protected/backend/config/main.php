@@ -95,6 +95,14 @@ return CMap::mergeArray(
                     ),
                 ),
             ),
+            /*
+            'urlManager' => array(
+                'urlFormat' => 'path',
+                'showScriptName' => false,
+                'urlSuffix' => '/',
+                'rules' => $params['url.rules']
+            ),
+            */
         ),
     ),
     $mainLocalConfiguration

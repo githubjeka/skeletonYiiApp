@@ -337,6 +337,8 @@ FileETag None
 # Options +SymLinksIfOwnerMatch
   RewriteEngine On
 # RewriteBase /
+  RewriteRule ^backend backend.php [L]
+  RewriteRule ^site index.php [L]
 </IfModule>
 
 
