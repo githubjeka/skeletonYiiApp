@@ -2,37 +2,37 @@
 /**
  * Step 1.
  * Verification of claims
- *
+ * @var $this install\controllers\InstallController
+ * @var $directories
  * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
 $errors = false;
 ?>
 
 <?php if (PHP_VERSION_ID < 50300): ?>
-<h3>
-    Для установки нужен PHP 5.3<br/>
+<h3 class="error-bar">
+    Для установки нужен PHP 5.3+<br/>
     У вас установлен: <?php echo phpversion(); ?>
 </h3>
 <?php else: ?>
 
-
 <h4>
-    <strong class="fg-color-blueLight">1</strong>
+    <strong class="fg-color-darken">1</strong>
     <small>→2→3</small>
 </h4>
 
 <h1><?php echo \Yii::t('install', 'Step 1. Verification of claims') ?></h1>
+
 <div class="progress-bar">
     <div class="bar bg-color-pink" style="width: 30%"></div>
 
 </div>
-<div class="line"></div>
 
-<div class="form">
-
-    <table cellpadding="3" cellspacing="3">
+<div>
+    <table>
+        <tbody>
         <tr>
-            <td width="300px">
+            <td>
                 <?php echo \Yii::t('install', 'Magic Quotes Disabled'); ?>
                 <br> magic_quotes_gpc = Off
             </td>
@@ -44,19 +44,17 @@ $errors = false;
                 <?php } ?>
             </td>
         </tr>
-    </table>
-
-    <div class="m20">
-        <?php echo \Yii::t('install', 'The following list of directories and files should be writable:'); ?>
-    </div>
-    <table cellpadding="3" cellspacing="3">
-        <?php foreach ($this->getDirectories() as $path): ?>
         <tr>
-            <td width="300px"><?php echo $path ?></td>
+            <td colspan="2" class="fg-color-pink">
+                <?php echo \Yii::t('install', 'The following list of directories and files should be writable:'); ?>
+            </td>
+        </tr>
+            <?php foreach ($directories as $path): ?>
+        <tr>
+            <td><?php echo $path ?></td>
             <td>
                 <?php
-                $result = $this->isWritable($path);
-                if ($result) {
+                if ($this->isWritable($path)) {
                     echo '<span class="fg-color-green">OK</span>';
                 } else {
                     $errors = true;
@@ -65,7 +63,8 @@ $errors = false;
                 ?>
             </td>
         </tr>
-        <?php endforeach ?>
+            <?php endforeach ?>
+        </tbody>
     </table>
 
     <div class="row buttons">

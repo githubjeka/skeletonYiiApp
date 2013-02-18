@@ -72,6 +72,14 @@ return CMap::mergeArray(
                 'basePath' => $root . '/frontend/www/assets',
                 'baseUrl' => '/protected/frontend/www/assets',
             ),
+            /*
+            'urlManager' => array(
+                'urlFormat' => 'path',
+                'showScriptName' => false,
+                'urlSuffix' => '/',
+                'rules' => $params['url.rules']
+            ),
+            */
         ),
     ),
     $mainLocalConfiguration

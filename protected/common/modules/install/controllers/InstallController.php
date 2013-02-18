@@ -21,7 +21,7 @@ class InstallController extends \CController
         if (isset($_POST['next'])) {
             $this->redirect($this->createUrl('step2'));
         }
-        $this->render('step1');
+        $this->render('step1', array('directories' => $this->getDirectories()));
     }
 
     public function actionStep2()
