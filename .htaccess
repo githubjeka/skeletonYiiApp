@@ -337,10 +337,9 @@ FileETag None
 # Options +SymLinksIfOwnerMatch
   RewriteEngine On
 # RewriteBase /
-  RewriteRule ^backend backend.php [L]
-  RewriteCond %{REQUEST_FILENAME} !/(css|images|js)/
-  RewriteRule (.*) index.php [L]
-
+#  RewriteRule ^backend backend.php [L]
+#  RewriteCond %{REQUEST_FILENAME} !/(css|images|js)/
+#  RewriteRule !backend(.*) index.php [L]
 </IfModule>
 
 
