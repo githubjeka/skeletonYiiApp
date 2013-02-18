@@ -338,7 +338,9 @@ FileETag None
   RewriteEngine On
 # RewriteBase /
   RewriteRule ^backend backend.php [L]
-  RewriteRule ^!backend index.php [L]
+  RewriteCond %{REQUEST_FILENAME} !/(css|images|js)/
+  RewriteRule (.*) index.php [L]
+
 </IfModule>
 
 
