@@ -68,6 +68,10 @@ class ModulesController extends ComposerHelper
         $form = new UploadForm('uploadModule');
         $archive = \CUploadedFile::getInstance($form, 'archive');
 
+        var_dump(isset($archive));
+        var_dump($form);
+        var_dump($form->validate());
+
         if (isset($archive) && $form->validate()) {
 
             $fullNameModule = substr($archive->name, 0, -4);

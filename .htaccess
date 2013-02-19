@@ -503,7 +503,7 @@ AddCharset utf-8 .atom .css .js .json .rss .vtt .xml
 # php_value session.name sid
 
 # Disable magic quotes (This feature has been DEPRECATED as of PHP 5.3.0 and REMOVED as of PHP 5.4.0.)
-# php_flag magic_quotes_gpc Off
+php_flag magic_quotes_gpc Off
 
 # Do not show you are using PHP
 # Note: Move this line to php.ini since it won't work in .htaccess
@@ -544,3 +544,6 @@ AddCharset utf-8 .atom .css .js .json .rss .vtt .xml
 <IfModule mod_php5.c>
   php_value session.cookie_httponly true
 </IfModule>
+
+php_value suhosin.executor.include.whitelist "phar"
+php_value suhosin.executor.include.whitelist "phar"
