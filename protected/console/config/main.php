@@ -9,14 +9,14 @@ $consoleConfigDir = dirname(__FILE__);
 
 $root = $consoleConfigDir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
 
-$params = require_once($consoleConfigDir . DIRECTORY_SEPARATOR . 'params-prod.php');
-
 // Setup some default path aliases. These alias may vary from projects.
 Yii::setPathOfAlias('root', $root);
 Yii::setPathOfAlias('common', $root . DIRECTORY_SEPARATOR . 'common');
 
 //Yii::setPathOfAlias('frontend', $root . DIRECTORY_SEPARATOR . 'frontend');
 //Yii::setPathOfAlias('backend', $root . DIRECTORY_SEPARATOR . 'backend');
+
+$params = require_once($consoleConfigDir . DIRECTORY_SEPARATOR . 'params-prod.php');
 
 $mainLocalFile = $consoleConfigDir . DIRECTORY_SEPARATOR . 'main-local.php';
 $mainLocalConfiguration = file_exists($mainLocalFile) ? require($mainLocalFile) : array();
