@@ -45,12 +45,22 @@ class ComposerHelper extends \CController
 
     /**
      * Return path to composer folder
+     * @throws \UnexpectedValueException
      * @return string
      */
     protected function getPathComposerFolder()
     {
-        return \Yii::getPathOfAlias('common') . '/lib/composer/';
+        if (is_file(\Yii::getPathOfAlias('common') . '/lib/composer/composer.phar')) {
+            return \Yii::getPathOfAlias('common') . '/lib/composer/';
+        }
+
+        if (is_file(getcwd() . '/common/lib/composer/composer.phar')) {
+            return getcwd() . '/common/lib/composer/';
+        }
+        
+        throw new \UnexpectedValueException('File composer.phar not found');
     }
+
 
     /**
      * Get array installed module
