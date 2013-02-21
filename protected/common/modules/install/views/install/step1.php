@@ -54,7 +54,9 @@ $errors = false;
             <td><?php echo $path ?></td>
             <td>
                 <?php
-                if ($this->isWritable($path)) {
+                    CVarDumper::dump($this,10,true);
+                    die();
+                if ($this->getOwner()->isWritable($path)) {
                     echo '<span class="fg-color-green">OK</span>';
                 } else {
                     $errors = true;

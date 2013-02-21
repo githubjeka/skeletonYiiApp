@@ -7,7 +7,7 @@ namespace common\modules\Install;
 /**
  * InstallModule
  *
- *  @author Evgeniy Tkachenko <et.coder@gmail.com>
+ * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
 class InstallModule extends \CWebModule
 {
@@ -34,5 +34,10 @@ class InstallModule extends \CWebModule
         $runner->run($args);
         \Yii::app()->setBasePath($pathApp);
         return ob_get_clean();
+    }
+
+    public static function getPath()
+    {
+        return dirname(__FILE__);
     }
 }
