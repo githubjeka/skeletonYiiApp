@@ -1,7 +1,5 @@
 <?php
-
-use common\modules\Install\InstallModule;
-use \Install\extensions\helpers\AbstractStep;
+use \Install\extensions\helpers\AbstractStepBehavior;
 
 /**
  * Environment.php file.
@@ -9,21 +7,40 @@ use \Install\extensions\helpers\AbstractStep;
  * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
 
-class Environment extends CBehavior implements AbstractStep
+class Environment extends AbstractStepBehavior
 {
     public function onStep()
     {
-        InstallModule::isInstall();
-
-        if (isset($_POST['next'])) {
-           Yii::app()->controller->redirect(Yii::app()->controller->createUrl('step2'));
+        if ($this->onValidStep()) {
+            $this->cheekRightFolder();
         }
-        Yii::app()->controller->render('step1', array('directories' => $this->getDirectories()));
+        $this->renderView();
     }
 
-    protected function getDirectories()
+    public function validate()
     {
-        $root = \Yii::getPathOfAlias('root');
+        return false;
+    }
+
+    private function cheekRightFolder()
+    {
+        foreach ($this->getDirectories() as $path) {
+            if (!$this->isWritable($path)) {
+                $errors[] = $path . Yii::t('install',' must exist and be writable');
+            }
+        }
+        if (isset($errors)) {
+            $this->_hasError=true;
+            $this->_errors=$errors;
+        }
+
+        return !$this->_hasError;
+    }
+
+    private function getDirectories()
+    {
+        $root = realpath(\Yii::getPathOfAlias('root'));
+
         $directories = \SplFixedArray::fromArray(
             array(
                 $root . '/frontend/www/assets',
@@ -33,11 +50,7 @@ class Environment extends CBehavior implements AbstractStep
                 $root . '/console/runtime'
             )
         );
-        $this->removeTempDir($directories);
-        $this->createTempDir($directories);
-        foreach ($directories as $key => $value) {
-            $directories[$key] = realpath($value);
-        }
+
         return $directories;
     }
 
@@ -88,13 +101,14 @@ class Environment extends CBehavior implements AbstractStep
             }
         }
     }
+
     /**
      * Check if path is writeable
      * @param $path
      * @return bool
      */
-    public function isWritable($path)
+    private function isWritable($path)
     {
-        return is_writable($path);
+        return is_writable($path) || @chmod($path, 0777) && is_writable($path);
     }
 }

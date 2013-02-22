@@ -17,5 +17,6 @@ class InstallController extends \CController
     public function actionStep()
     {
         $this->attachBehavior('iteratorStep', new StepsBehaviorIterator());
+        $this->iteratorStep->run();
     }
 }

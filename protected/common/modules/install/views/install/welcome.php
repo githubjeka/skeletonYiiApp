@@ -7,7 +7,6 @@
  */
 ?>
 
-<h3 class="warning-bar">
-    Для установки нужен PHP 5.3+<br/>
-    У вас установлен: <?php echo phpversion(); ?>
+<h3 class="bg-color-yellow padding30">
+    <?php echo Yii::t('install','Welcome to '.Yii::app()->name); ?>
 </h3>

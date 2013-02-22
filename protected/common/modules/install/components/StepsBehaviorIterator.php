@@ -1,7 +1,7 @@
 <?php
 namespace Install\components;
 
-use common\modules\Install\InstallModule;
+use Install\extensions\helpers\AbstractStepBehavior;
 
 \Yii::import('install.components.steps.*');
 
@@ -11,37 +11,70 @@ use common\modules\Install\InstallModule;
  * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
 
-class StepsBehaviorIterator extends \CBehavior
+class  StepsBehaviorIterator extends \CBehavior
 {
-    protected $currentStep;
+    /**
+     * @var array
+     */
+    private $_steps = array(
+        'Welcome',
+        'Environment',
+        'Finish',
+    );
 
-    public function __construct()
+    /**
+     *
+     */
+    public function run()
     {
-        $this->getSteps();
-        $this->currentStep = $this->getSteps()->current();
+        $stepsObject = new \ArrayIterator($this->_steps);
 
-        if (array_key_exists('Install\\extensions\\helpers\\AbstractStepBehavior', class_parents($this->currentStep))) {
-            $this->attachBehavior('step', $this->currentStep);
-            $this->step->onStep();
+        if (isset(\Yii::app()->session['installStep'])) {
+
+            if (isset($_GET['btn'])) {
+
+                $sN = (int)\Yii::app()->session['installStep'];
+
+                if ($_GET['btn'] === 'prev') {
+                    if ($sN > 0) {
+                        $stepsObject->seek($sN-1);
+                    }
+                }
+
+                if ($_GET['btn'] === 'next') {
+                    $step = $this->getStep($stepsObject->current());
+                    if ($step->validate()) {
+                        if ($sN < $stepsObject->count()) {
+                            $stepsObject->seek($sN+1);
+                        }
+                    }
+                }
+            }
+        }
+
+        $step = $this->getStep($stepsObject->current());
+        $step->onStep();
+        \Yii::app()->session['installStep'] = $stepsObject->key();
+    }
+
+    /**
+     * @param $step string
+     * @return AbstractStepBehavior
+     * @throws \Exception
+     */
+    private function getStep($step)
+    {
+        if (class_exists($step)) {
+            $requiredClass = 'Install\extensions\helpers\AbstractStepBehavior';
+            if (array_key_exists($requiredClass, class_parents($step))) {
+                return $this->attachBehavior('step', $step);
+            } else {
+                throw new \Exception("Class {$step} should be extend AbstractStepBehavior");
+            }
+        } else {
+            throw new \Exception("Class {$step} not found");
         }
     }
 
-    public function setCurrentStep($currentStep)
-    {
-        $this->currentStep = $currentStep;
-    }
 
-    public function getCurrentStep()
-    {
-        return $this->currentStep;
-    }
-
-    protected function getSteps()
-    {
-        $steps = array(
-            'Welcome',
-            'Environment',
-        );
-        return new \ArrayIterator($steps);
-    }
 }
