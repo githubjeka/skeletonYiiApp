@@ -70,15 +70,14 @@ class InstallConfigureForm extends \CFormModel
         $root = \Yii::getPathOfAlias('root');
         $directories = \SplFixedArray::fromArray(
             array(
-//                $root . '/frontend/config/main.php',
                 $root . '/common/config/params-prod.php',
-//                $root . '/console/config/main.php'
             )
         );
         foreach ($directories as $configFile) {
             $this->writeConnectionSettings($configFile);
         }
 
+        return true;
     }
 
     /**
@@ -95,7 +94,6 @@ class InstallConfigureForm extends \CFormModel
         $content = preg_replace("/\'db.username\'\s*\=\>\s*\'.*\'/", "'db.username'=>'{$this->dbUserName}'", $content);
         $content = preg_replace("/\'db.password\'\s*\=\>\s*\'.*\'/", "'db.password'=>'{$this->dbPassword}'", $content);
         $content = preg_replace("/\'db.name\'\s*\=\>\s*\'.*\'/", "'db.name'=>'{$this->dbName}'", $content);
-        $content = preg_replace("/\'install\'\s*\=\>\s*.*/", "'install'=>false,", $content);
         file_put_contents($configFile, $content);
     }
 

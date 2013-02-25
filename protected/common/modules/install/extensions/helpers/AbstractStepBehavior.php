@@ -34,7 +34,7 @@ abstract class AbstractStepBehavior extends \CBehavior
         );
 
         // errors
-        if (!$this->onValidStep()) {
+        if (!empty($this->_errors)) {
             \Yii::app()->controller->render(
                 '_errors',
                 array(
@@ -51,7 +51,7 @@ abstract class AbstractStepBehavior extends \CBehavior
             '_nav',
             array(
                 'prev' => $this->_prevBtn,
-                'next' => ($this->onValidStep()) ? $this->_nextBtn : false,
+                'next' => $this->_nextBtn,
             )
         );
     }

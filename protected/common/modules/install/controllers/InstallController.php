@@ -14,6 +14,13 @@ class InstallController extends \CController
     public $defaultAction = 'step';
     public $layout = 'install.views.layout.install';
 
+    public function init() {
+        if (\Yii::app()->params['install']==false) {
+            $this->redirect($this->createAbsoluteUrl('/site'));
+        }
+        parent::init();
+    }
+
     public function actionStep()
     {
         $this->attachBehavior('iteratorStep', new StepsBehaviorIterator());

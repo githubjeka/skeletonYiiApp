@@ -11,15 +11,13 @@ class Environment extends AbstractStepBehavior
 {
     public function onStep()
     {
-        if ($this->onValidStep()) {
-            $this->cheekRightFolder();
-        }
-        $this->renderView();
+        $this->_header=Yii::t('install','Environment');
+        $this->renderView(array('valid'=>$this->validate()));
     }
 
     public function validate()
     {
-        return false;
+        return $this->cheekRightFolder();
     }
 
     private function cheekRightFolder()
@@ -30,11 +28,11 @@ class Environment extends AbstractStepBehavior
             }
         }
         if (isset($errors)) {
-            $this->_hasError=true;
             $this->_errors=$errors;
+            return false;
         }
 
-        return !$this->_hasError;
+        return true;
     }
 
     private function getDirectories()
@@ -47,7 +45,8 @@ class Environment extends AbstractStepBehavior
                 $root . '/backend/www/assets',
                 $root . '/frontend/runtime',
                 $root . '/backend/runtime',
-                $root . '/console/runtime'
+                $root . '/console/runtime',
+                $root . '/common/config/params-prod.php'
             )
         );
 

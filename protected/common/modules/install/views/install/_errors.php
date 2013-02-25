@@ -4,7 +4,7 @@
  * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
 ?>
-<?php if (isset($hasErrors) && $hasErrors===true) : ?>
+<?php if (isset($errors) && !empty($errors)) : ?>
 
 <h3 class="small"><?php echo Yii::t('install', 'Errors');?></h3>
 

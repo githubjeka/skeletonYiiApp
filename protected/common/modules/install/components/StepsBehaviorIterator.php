@@ -19,6 +19,7 @@ class  StepsBehaviorIterator extends \CBehavior
     private $_steps = array(
         'Welcome',
         'Environment',
+        'DbConnect',
         'Finish',
     );
 
@@ -30,25 +31,28 @@ class  StepsBehaviorIterator extends \CBehavior
         $stepsObject = new \ArrayIterator($this->_steps);
 
         if (isset(\Yii::app()->session['installStep'])) {
+            $sN = (int)\Yii::app()->session['installStep'];
+            $stepsObject->seek($sN);
 
             if (isset($_GET['btn'])) {
 
-                $sN = (int)\Yii::app()->session['installStep'];
-
                 if ($_GET['btn'] === 'prev') {
                     if ($sN > 0) {
-                        $stepsObject->seek($sN-1);
+                        $stepsObject->seek($sN - 1);
                     }
                 }
 
                 if ($_GET['btn'] === 'next') {
                     $step = $this->getStep($stepsObject->current());
                     if ($step->validate()) {
-                        if ($sN < $stepsObject->count()) {
-                            $stepsObject->seek($sN+1);
+                        if ($sN < ($stepsObject->count() - 1)) {
+                            $stepsObject->seek($sN + 1);
                         }
                     }
                 }
+
+                \Yii::app()->session['installStep'] = $stepsObject->key();
+                \Yii::app()->controller->redirect(array('/install'));
             }
         }
 
