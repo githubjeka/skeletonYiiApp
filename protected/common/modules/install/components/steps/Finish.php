@@ -1,7 +1,6 @@
 <?php
 
 use \Install\extensions\helpers\AbstractStepBehavior;
-use common\modules\Install\InstallModule;
 
 /**
  * Environment.php file.
@@ -25,7 +24,7 @@ class Finish extends AbstractStepBehavior
     public function validate()
     {
         try {
-            InstallModule::wrapperConsoleRun(array('\Yiic', 'migrate', '--interactive=0'));
+            \WebApplication::consoleCommandRun(array('\Yiic', 'migrate', '--interactive=0'));
             $configFile = \Yii::getPathOfAlias('root'). '/common/config/params-prod.php';
             $content = file_get_contents($configFile);
             $content = preg_replace("/\'install\'\s*\=\>\s*.*/", "'install'=>false,", $content);

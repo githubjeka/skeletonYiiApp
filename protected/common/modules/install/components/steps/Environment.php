@@ -22,7 +22,7 @@ class Environment extends AbstractStepBehavior
 
     private function cheekRightFolder()
     {
-        foreach ($this->getDirectories() as $path) {
+        foreach ($this->getEnvironments() as $path) {
             if (!$this->isWritable($path)) {
                 $errors[] = $path . Yii::t('install',' must exist and be writable');
             }
@@ -35,7 +35,7 @@ class Environment extends AbstractStepBehavior
         return true;
     }
 
-    private function getDirectories()
+    private function getEnvironments()
     {
         $root = realpath(\Yii::getPathOfAlias('root'));
 

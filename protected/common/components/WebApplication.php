@@ -34,25 +34,44 @@ class WebApplication extends CWebApplication
 
         if ($modules = glob($this->getBasePath() . '/modules/onNamespace/*', GLOB_ONLYDIR)) {
             foreach ($modules as $moduleDirectory) {
-                $this->setModules(
-                    array(
-                        basename($moduleDirectory) => array(
-                            'class' => '\backend\modules\onNamespace\\' . strtolower(
-                                basename($moduleDirectory)
-                            ) . '\\' . ucfirst(
-                                basename($moduleDirectory)
-                            ) . 'Module'
+                if (!$this->hasModule(basename($moduleDirectory))) {
+                    $this->setModules(
+                        array(
+                            basename($moduleDirectory) => array(
+                                'class' => '\backend\modules\onNamespace\\' . strtolower(
+                                    basename($moduleDirectory)
+                                ) . '\\' . ucfirst(
+                                    basename($moduleDirectory)
+                                ) . 'Module'
+                            )
                         )
-                    )
-                );
+                    );
+                }
             }
         }
         if ($modules = glob($this->getModulePath() . '/*', GLOB_ONLYDIR)) {
             foreach ($modules as $moduleDirectory) {
-                $this->setModules(array(basename($moduleDirectory)));
+                if (!$this->hasModule(basename($moduleDirectory))) {
+                    $this->setModules(array(basename($moduleDirectory)));
+                }
             }
         }
 
         parent::init();
+    }
+
+    public static function consoleCommandRun($args = array())
+    {
+        $pathApp = \Yii::getPathOfAlias('application');
+        \Yii::setPathOfAlias('application', \Yii::getPathOfAlias('console'));
+        $commandPath = \Yii::getPathOfAlias('application') . '/commands';
+        $runner = new \CConsoleCommandRunner();
+        $runner->addCommands($commandPath);
+        $commandPath = \Yii::getFrameworkPath() . DIRECTORY_SEPARATOR . 'cli' . DIRECTORY_SEPARATOR . 'commands';
+        $runner->addCommands($commandPath);
+        ob_start();
+        $runner->run($args);
+        \Yii::app()->setBasePath($pathApp);
+        return ob_get_clean();
     }
 }
