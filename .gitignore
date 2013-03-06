@@ -25,15 +25,17 @@ index
 protected/backend/www/assets/
 protected/backend/runtime/
 /protected/backend/modules/
-!/protected/backend/modules/onNamespace/composer/
-!/protected/backend/modules/onNamespace/config/
 protected/frontend/www/assets/
 protected/frontend/runtime/
 /protected/frontend/modules/
 protected/console/runtime/
 protected/common/runtime/
-protected/common/lib/composer/
+
+!/protected/backend/modules/onNamespace/composer/
+/protected/backend/modules/onNamespace/composer/lib/composer/
 !protected/common/lib/composer/composer.phar
+!/protected/backend/modules/onNamespace/config/
+
 
 # configuration files created locally by post deployment script or by a developer
 protected/backend/config/main-local.php
