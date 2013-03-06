@@ -22,25 +22,10 @@ switch
 index
 
 # runtime and cache directories
-protected/backend/www/assets/
 protected/backend/runtime/
-/protected/backend/modules/
-protected/frontend/www/assets/
 protected/frontend/runtime/
-/protected/frontend/modules/
 protected/console/runtime/
-protected/common/runtime/
-
-!/protected/backend/modules/onNamespace/composer/
-/protected/backend/modules/onNamespace/composer/lib/composer/
-!protected/common/lib/composer/composer.phar
-!/protected/backend/modules/onNamespace/config/
-
 
 # configuration files created locally by post deployment script or by a developer
-protected/backend/config/main-local.php
-protected/frontend/config/main-local.php
-protected/console/config/main-local.php
-protected/backend/config/params-local.php
-protected/frontend/config/params-local.php
-protected/common/config/params-local.php
+*main-local.php
+*params-local.php
