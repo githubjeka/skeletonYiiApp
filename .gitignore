@@ -25,7 +25,8 @@ index
 protected/backend/www/assets/
 protected/backend/runtime/
 /protected/backend/modules/
-!/protected/backend/modules/onNamespace/.gitignore
+!/protected/backend/modules/onNamespace/composer/
+!/protected/backend/modules/onNamespace/config/
 protected/frontend/www/assets/
 protected/frontend/runtime/
 /protected/frontend/modules/
