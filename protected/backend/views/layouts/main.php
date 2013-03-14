@@ -66,7 +66,8 @@
                             'htmlOptions' => array('class' => 'dropdown-menu'),
                             'activeCssClass' => 'active',
                             'items' => array(
-                                array('label' => Yii::t('ui', 'Options'), 'url' => array('/install/config')),
+                                array('label' => Yii::t('ui', 'Options'), 'url' => array('/config')),
+                                array('label' => Yii::t('ui', 'Modules'), 'url' => array('/composer')),
                             ),
                         )
                     ); ?>

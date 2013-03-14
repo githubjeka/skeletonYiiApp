@@ -34,7 +34,7 @@ class InstallFinishForm extends \CFormModel
 	{
 		if($this->hasErrors())
 			return false;
-        InstallModule::wrapperConsoleRun(array('\Yiic', 'migrate', '--interactive=0'));
+        \WebApplication::consoleCommandRun(array('\Yiic', 'migrate', '--interactive=0'));
         return true;
 	}
 

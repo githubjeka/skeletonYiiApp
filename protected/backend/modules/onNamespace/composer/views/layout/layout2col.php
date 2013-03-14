@@ -6,25 +6,17 @@
 
     <div class="page-sidebar">
         <ul>
-            <li>
-                <?php
-                echo CHtml::link(
-                    Yii::t('ui', 'Options'),
-                    array('/install/config')
-                );
-                ?>
-            </li>
             <li data-role="dropdown">
                 <?php echo CHtml::link(Yii::t('ui', 'Modules')); ?>
                 <ul class="sub-menu light sidebar-dropdown-menu open">
                     <li>
-                        <?php echo CHtml::link(Yii::t('ui', 'List modules'), array('/install/modules')); ?>
+                        <?php echo CHtml::link(Yii::t('ui', 'List modules'), array('modules/list')); ?>
                     </li>
                     <li>
-                        <?php echo CHtml::link(Yii::t('ui', 'Upload module'), array('/install/modules/upload')); ?>
+                        <?php echo CHtml::link(Yii::t('ui', 'Upload module'), array('modules/upload')); ?>
                     </li>
                     <li>
-                        <?php echo CHtml::link(Yii::t('ui', 'Stored modules'), array('/install/modules/stored')); ?>
+                        <?php echo CHtml::link(Yii::t('ui', 'Stored modules'), array('modules/stored')); ?>
                     </li>
 
                 </ul>

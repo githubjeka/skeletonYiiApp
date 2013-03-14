@@ -1,20 +1,19 @@
 <?php
-namespace Install\controllers;
+namespace composer\controllers;
 
-use Install\models\UploadForm;
-use Install\extensions\helpers\ComposerHelper;
-use common\modules\Install\InstallModule;
+use composer\models\UploadForm;
+use composer\components\CComposerController;
 
 /**
  * ModulesController file.
  * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
-class ModulesController extends ComposerHelper
+class ModulesController extends CComposerController
 {
     /**
      * @var string
      */
-    public $layout = 'install.views.layout.layout2col';
+    public $layout = 'composer.views.layout.layout2col';
     /**
      * @var string
      */
@@ -111,7 +110,7 @@ class ModulesController extends ComposerHelper
                     //TODO use Yii::app->getModulePath()
                     $migrationPath = 'backend.modules.' . $nameModule . '.migrations';
                     if (is_dir(\Yii::getPathOfAlias($migrationPath))) {
-                        $logMigration = InstallModule::wrapperConsoleRun(
+                        $logMigration = \WebApplication::consoleCommandRun(
                             array('\Yiic', 'migrate', 'up', '--interactive=0', '--migrationPath=' . $migrationPath)
                         );
                         $logMigration = explode("\n", $logMigration);

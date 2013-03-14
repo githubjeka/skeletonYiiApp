@@ -1,14 +1,14 @@
 <?php
-namespace Install\extensions\helpers;
+namespace composer\components;
 
 use Composer\Package\Version\VersionParser;
 
 /**
- * ComposerHelper.php file.
+ * CComposerController.php file.
  *
  * @author Evgeniy Tkachenko <et.coder@gmail.com>
  */
-class ComposerHelper extends \CController
+class CComposerController extends \CController
 {
     /**
      * @var string
@@ -50,14 +50,10 @@ class ComposerHelper extends \CController
      */
     protected function getPathComposerFolder()
     {
-        if (is_file(\Yii::getPathOfAlias('common') . '/lib/composer/composer.phar')) {
-            return \Yii::getPathOfAlias('common') . '/lib/composer/';
+        if (is_file(\Yii::app()->getBasePath() . '/modules/onNamespace/composer/lib/composer/composer.phar')) {
+            return \Yii::app()->getBasePath() . '/modules/onNamespace/composer/lib/composer/';
         }
 
-        if (is_file(getcwd() . '/common/lib/composer/composer.phar')) {
-            return getcwd() . '/common/lib/composer/';
-        }
-        
         throw new \UnexpectedValueException('File composer.phar not found');
     }
 

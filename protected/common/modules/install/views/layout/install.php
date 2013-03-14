@@ -14,8 +14,6 @@
     <?php
     $clientScript = Yii::app()->clientScript;
     $clientScript->registerCssFile(Yii::app()->theme->baseUrl . '/css/modern.css');
-    $clientScript->registerCoreScript('jquery', CClientScript::POS_HEAD);
-
     ?>
     <link rel="icon" href="<?php echo Yii::app()->request->baseUrl; ?>/images/favicon.ico" type="image/x-icon"/>
 </head>
