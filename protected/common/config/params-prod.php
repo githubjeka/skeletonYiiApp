@@ -15,9 +15,9 @@ $localCommonParams = file_exists($commonParamsLocalFile) ? require ($commonParam
 return CMap::mergeArray(
     array(
         'install' => true,
-        'db.name' => 'Skeleton Airily',
-        'db.connectionString' => 'mysql:host=localhost;dbname=airily',
-        'db.username' => 'root',
+        'db.name' => '',
+        'db.connectionString' => '',
+        'db.username' => '',
         'db.password' => '',
         // cache settings -if APC is not loaded, then use CDbCache
         'cache.core' => extension_loaded('apc') ?

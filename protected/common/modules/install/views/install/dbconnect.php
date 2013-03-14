@@ -4,20 +4,7 @@
  * @var $form CActiveForm
  */
 ?>
-
-<h4>
-    <small>1→</small>
-    <strong class="fg-color-darken">2</strong>
-    <small>→3</small>
-</h4>
-
-<h1><?php echo Yii::t('install', 'Step 2. DB connection') ?></h1>
-<div class="progress-bar">
-    <div class="bar bg-color-pink" style="width: 30%"></div>
-    <div class="bar bg-color-yellow" style="width: 30%"></div>
-</div>
-<div class="line"></div>
-
+<?php if (($valid)==false) { ?>
 <div class="form wide">
     <?php $form = $this->beginWidget('CActiveForm'); ?>
 
@@ -44,8 +31,13 @@
     </div>
 
     <div class="row buttons">
-        <input type="submit" name="next" value="<?php echo Yii::t('install', 'Connect') ?>">
+        <input type="submit" name="connect" value="<?php echo Yii::t('install', 'Connect') ?>">
     </div>
 
     <?php $this->endWidget(); ?>
 </div>
+<?php } else { ?>
+<h3 class="bg-color-green padding30">
+    <?php echo Yii::t('install','DB connection is successful'); ?>
+</h3>
+<?php } ?>

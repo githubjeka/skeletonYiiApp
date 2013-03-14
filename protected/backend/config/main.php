@@ -57,9 +57,6 @@ return CMap::mergeArray(
             'gii' => array(
                 'class' => 'system.gii.GiiModule',
                 'password'=>'1',
-                'generatorPaths' => array(
-                    'bootstrap.gii'
-                )
             )
             */
         ),
