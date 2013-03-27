@@ -107,7 +107,7 @@
                     </li>
                 </ul>
 
-                 <?php echo CHtml::link('<span class="element place-right">'.Yii::t('ui', 'Show site').' </span>', '/'); ?>
+                 <?php echo CHtml::link('<span class="element place-right">'.Yii::t('ui', 'Show site').' </span>', './'); ?>
             </div>
         </nav>
 
